@@ -308,6 +308,7 @@
    MODULE 1 · TOKENS  (colours sampled from your reference image)
    ═══════════════════════════════════════════════════════════════ */
 :root {
+  --vh: 1dvh;   /* one unit of viewport height; svh (below) where supported: it does NOT change when Safari's toolbar slides, so the envelope never resizes while scrolling */
   --ground:    #b79585;   /* background (the carpet's colour; JS refines it from the picture) */
   --ext-ph:    #FFF2B3;   /* envelope exterior */
   --liner-ph:  #708840;   /* envelope liner (under the pattern) */
@@ -371,8 +372,8 @@ button { font: inherit; color: inherit; }
    scaled up 7%. Card is 93.6% of the envelope width; gap card→envelope .16e.
    ═══════════════════════════════════════════════════════════════ */
 .stage {
-  position: sticky; top: 0; z-index: 1; height: 100dvh; overflow: hidden;
-  --e:  calc(1.1 * min(75.73vw, calc((100dvh - 150px) / 1.75082), 387px)); /* envelope width (+10%) */
+  position: sticky; top: 0; z-index: 1; height: calc(100 * var(--vh)); overflow: hidden;
+  --e:  calc(1.1 * min(75.73vw, calc((100 * var(--vh) - 150px) / 1.75082), 387px)); /* envelope width (+10%) */
   --H:  calc(var(--e) * .65322);    /* envelope height */
   --c:  calc(var(--e) * .9357);    /* card */
   --d:  calc(var(--e) * .4678);
@@ -497,15 +498,15 @@ html.has-liner .paint-liner {
 .liner-panel {
   z-index: 1; left: 0; top: var(--y0); width: var(--e); height: var(--H);
   border-radius: calc(var(--e) * .012);
-  clip-path: inset(0 calc(var(--e) * .048) 2px calc(var(--e) * .048) round 0 0 calc(var(--e) * .02) calc(var(--e) * .02));
+  clip-path: inset(0 calc(var(--e) * .048) 4px calc(var(--e) * .048) round 0 0 calc(var(--e) * .02) calc(var(--e) * .02));
   --bx: 0px; --by: calc((var(--d) + var(--E)) * -1);
 }
-/* once the flap has lifted, the lining tucks 1.5px under its edge so no hairline can show along the fold
+/* once the flap has lifted, the lining tucks 4px under its edge so no hairline can show along the fold
    (done only after opening: while closed, those 1.5px would peek out above the flap as a thin green line) */
 .stage.is-open .liner-panel { animation: liner-tuck 1ms steps(1, start) calc(1000ms * var(--k)) both; }
 @keyframes liner-tuck {
   from { top: var(--y0); height: var(--H); --by: calc((var(--d) + var(--E)) * -1); }
-  to   { top: calc(var(--y0) - 1.5px); height: calc(var(--H) + 1.5px); --by: calc((var(--d) + var(--E)) * -1 + 1.5px); }
+  to   { top: calc(var(--y0) - 4px); height: calc(var(--H) + 4px); --by: calc((var(--d) + var(--E)) * -1 + 4px); }
 }
 
 /* ── flap ── */
@@ -1086,10 +1087,11 @@ html.view-open, html.view-open body { overflow: hidden; }
 .dev span { opacity: .6; padding: 0 2px 0 8px; }
 </style>
 <style>
+@supports (height: 100svh) { :root { --vh: 1svh; } }
 /* Tablet / narrow-window (not phone, not desktop layer): the lifted card reaches the top nav on tall windows,
    so keep a little more vertical room. Phones (<500px wide) and landscape/short windows are unchanged. */
 @media (min-width: 500px) and (min-height: 700px) {
-  .stage { --e: calc(1.1 * min(75.73vw, calc((100dvh - 200px) / 1.75082), 387px)); }
+  .stage { --e: calc(1.1 * min(75.73vw, calc((100 * var(--vh) - 200px) / 1.75082), 387px)); }
 }
 </style>
 <style>
@@ -1107,7 +1109,7 @@ html.view-open, html.view-open body { overflow: hidden; }
    DESKTOP LAYER (>= 1024px) · additive only; phones never see this
    ═══════════════════════════════════════════════════════════════ */
 @media (min-width: 1024px) {
-  .stage { --e: calc(1.1 * min(75.73vw, calc((100dvh - 150px) / 1.75082), 560px, max(30vw, 336px))); }
+  .stage { --e: calc(1.1 * min(75.73vw, calc((100 * var(--vh) - 150px) / 1.75082), 560px, max(30vw, 336px))); }
   /* home: the closed envelope is shown larger than the opened set (which has to fit card + envelope on one screen);
      it eases back to normal size as the flap opens */
   .assembly { scale: var(--env-k); transition: opacity .3s ease, scale calc(1900ms * var(--k)) cubic-bezier(.45, .05, .3, 1) calc(250ms * var(--k)); }
