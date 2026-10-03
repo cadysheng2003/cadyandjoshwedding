@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Cady &amp; Josh · March 26–31, 2027</title>
-<meta name="theme-color" content="#575B25">
+<meta name="theme-color" content="#d29592">
 <meta name="description" content="Cady &amp; Josh">
 <meta name="robots" content="noindex, nofollow, noarchive">
 <link rel="icon" type="image/png" href="favicon.png">
@@ -207,7 +207,7 @@
   function applyPalette(key) {
     var p = PALETTES[key] || PALETTES.a, s = document.documentElement.style;
     var rgbv = function (hx) { return hex2rgb(hx).join(', '); };
-    s.setProperty('--ground', p.ground);      s.setProperty('--ground-deep', p.deep);   s.setProperty('--ground-deep-rgb', rgbv(p.deep));
+    if (!window.BG_IMG) s.setProperty('--ground', p.ground);      s.setProperty('--ground-deep', p.deep);   s.setProperty('--ground-deep-rgb', rgbv(p.deep));
     s.setProperty('--on-ground', p.on);       s.setProperty('--ext-ph', p.ext);         s.setProperty('--grain-ext', extGrain(p.ext));  s.setProperty('--ext-flap', p.extFlap || mixHex(p.ext, '#ffffff', .06));         s.setProperty('--liner-ph', p.liner);
     s.setProperty('--ivory', p.ivory);        s.setProperty('--ivory-rgb', rgbv(p.ivory));
     s.setProperty('--ink', p.ink);            s.setProperty('--ink-rgb', rgbv(p.ink));
@@ -215,7 +215,6 @@
     s.setProperty('--accent', p.accent);      s.setProperty('--accent-rgb', rgbv(p.accent));
     s.setProperty('--accent-dark', p.accentDark); s.setProperty('--accent-dark-rgb', rgbv(p.accentDark));
     s.setProperty('--bg-botanical', enc(botanical(p.ground, p.on)));
-    var meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', p.ground);
     document.documentElement.dataset.palette = key;
     if (window.__bgSrc && window.__adaptGround) setTimeout(function () { window.__adaptGround(window.__bgSrc); }, 0);
     if (window.__palette) window.__palette.current = key;
@@ -228,6 +227,11 @@
      Looks at what a phone actually shows (the centre strip), measures the two places type sits
      (top-right corner, and the band under the envelope), then picks whichever of the palette's
      cream or a deep burgundy gives the better worst-case contrast. Swap the picture and it re-decides. */
+  /* Browser bars (iOS status bar / toolbar, Android address bar): one flat colour, chosen to continue whatever is on screen. */
+  window.__setBar = function (c) {
+    if (window.__barNow === c) return; window.__barNow = c;
+    var meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', c);
+  };
   window.__adaptGround = function (src) {
     window.__bgSrc = src;
     var img = new Image();
@@ -273,7 +277,6 @@
         s.setProperty('--ground-deep', deep); s.setProperty('--ground-deep-rgb', hex2rgb(deep).join(', '));
         var top = region(0, 3, 0, 24).rgb, tc = rgb2hex(top);
         s.setProperty('--ground', tc);
-        var meta = document.querySelector('meta[name="theme-color"]'); if (meta) meta.setAttribute('content', tc);
         document.documentElement.dataset.onGround = useDark ? 'dark' : 'light';
       } catch (e) { /* keep the palette colours */ }
     };
@@ -305,7 +308,7 @@
    MODULE 1 · TOKENS  (colours sampled from your reference image)
    ═══════════════════════════════════════════════════════════════ */
 :root {
-  --ground:    #575B25;   /* background (palette A; JS applies the chosen palette) */
+  --ground:    #b79585;   /* background (the carpet's colour; JS refines it from the picture) */
   --ext-ph:    #FFF2B3;   /* envelope exterior */
   --liner-ph:  #708840;   /* envelope liner (under the pattern) */
   --ivory:     #FAF5EB;   /* paper */
@@ -2035,6 +2038,12 @@ window.TRAVEL_CONFIG = { routes: [
       var onPaper = inView || paper.getBoundingClientRect().top < 36, dy = inView ? 0 : y - lastY; if (!inView) lastY = y;
       if (topbar) { topbar.classList.toggle('on-paper', onPaper); if (inView || !onPaper || dy < -4) topbar.classList.remove('hide'); else if (dy > 4) topbar.classList.add('hide'); }
       if (cue) cue.classList.toggle('gone', y > 24);
+      if (window.__setBar) {
+        var bar = '#d29592';                                                    /* envelope page: the carpet's pink border */
+        if (views && views.rsvp && inView && view === 'rsvp' && views.rsvp.classList.contains('msg-bg')) bar = '#A5A990';   /* leave-a-message page */
+        else if (onPaper && !root.classList.contains('locked')) bar = getComputedStyle(root).getPropertyValue('--ivory').trim() || '#FAF5EB';   /* paper */
+        window.__setBar(bar);
+      }
     });
   }
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -2183,6 +2192,7 @@ window.TRAVEL_CONFIG = { routes: [
       else { fw.classList.remove('play'); }
     }
     views.rsvp.classList.toggle('msg-bg', name === 'message');
+    onScroll();
     var topbarEl = document.querySelector('.topbar');
     if (topbarEl) topbarEl.classList.toggle('force-white', name === 'message');
     setProgress(name);
