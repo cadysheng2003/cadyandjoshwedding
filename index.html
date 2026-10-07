@@ -1054,6 +1054,7 @@ html.view-open, html.view-open body { overflow: hidden; }
 .rows { margin: 10px 0 0; }
 .row { display: grid; grid-template-columns: 40% 1fr; gap: 14px; align-items: baseline; text-align: left; padding: 14px 0; border-bottom: 1px solid rgba(var(--ink-rgb), .1); }
 .row dt { font-family: var(--f2-sans); font-weight: 400; font-size: 10.5px; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); }
+.route--hotel .row dd, :root[lang="zh-Hans"] .route--hotel .row dd { letter-spacing: .01em; font-size: 15px; }
 .row__link { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; text-decoration-color: rgba(var(--ink-rgb), .5); overflow-wrap: anywhere; }
 .row__link:hover { text-decoration-color: currentColor; }
 .row dd { margin: 0; font-family: var(--f2-sans); font-weight: 400; font-size: 16px; line-height: 1.5; }
@@ -1554,6 +1555,13 @@ html.view-open, html.view-open body { overflow: hidden; }
     <h2 class="s-kicker" id="tr-title" data-i18n="tr.kicker"></h2>
     <p class="t-intro" data-i18n-html="tr.intro"></p>
     </div>
+    <section class="route route--hotel" id="route-hotel">
+      <h3 class="route__h" data-i18n="tr.hotel"></h3>
+      <div class="opt"><dl class="rows">
+        <div class="row"><dt data-i18n="tr.lbl.hotel"></dt><dd><a class="row__link" href="" target="_blank" rel="noopener noreferrer">Forte Kochi Heritage Hotel ↗</a></dd></div>
+        <div class="row"><dt data-i18n="tr.lbl.address"></dt><dd>1/373, Princess St,<br>Fort Nagar, Fort Kochi,<br>Kochi, Keralam 682001,<br>India</dd></div>
+      </dl></div>
+    </section>
     <div id="routes"></div>
     <div class="travel__end"><button class="quiet" id="travel-home" type="button" data-i18n="ui.toInvite"></button></div>
   </main>
@@ -1825,6 +1833,9 @@ window.TRAVEL_CONFIG = { routes: [
       'tr.kicker':   'Suggested Flights',
       'tr.intro':    'To make your trip to Kochi a little easier, we\'ve put together a few suggested flights from <span class="tr-citylink" data-route="0" role="link" tabindex="0">New York</span>, <span class="tr-citylink" data-route="1" role="link" tabindex="0">San Francisco</span>, and <span class="tr-citylink" data-route="2" role="link" tabindex="0">Boston</span>.',
       'tr.to':       'Kochi',
+      'tr.hotel':    'Where We\'re Staying',
+      'tr.lbl.hotel':   'Hotel',
+      'tr.lbl.address': 'Address',
       'tr.option':   'Option {n}',
       'tr.lbl.departureAirport': 'Departure Airport',
       'tr.lbl.departureTime':    'Departure',
@@ -1885,6 +1896,9 @@ window.TRAVEL_CONFIG = { routes: [
       'tr.kicker':   '推荐航班',
       'tr.intro':    '为了让您前往科钦的旅程更轻松，我们整理了从<span class="tr-citylink" data-route="0" role="link" tabindex="0">纽约</span>、<span class="tr-citylink" data-route="1" role="link" tabindex="0">旧金山</span>和<span class="tr-citylink" data-route="2" role="link" tabindex="0">波士顿</span>出发的几个推荐航班。',
       'tr.to':       '科钦',
+      'tr.hotel':    '入住酒店',
+      'tr.lbl.hotel':   '酒店',
+      'tr.lbl.address': '地址',
       'tr.option':   '方案 {n}',
       'tr.lbl.departureAirport': '出发机场',
       'tr.lbl.departureTime':    '出发时间',
