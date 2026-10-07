@@ -501,12 +501,12 @@ html.has-liner .paint-liner {
   clip-path: inset(0 calc(var(--e) * .048) 4px calc(var(--e) * .048) round 0 0 calc(var(--e) * .02) calc(var(--e) * .02));
   --bx: 0px; --by: calc((var(--d) + var(--E)) * -1);
 }
-/* once the flap has lifted, the lining tucks 4px under its edge so no hairline can show along the fold
+/* once the flap has lifted, the lining tucks 1.5px under its edge so no hairline can show along the fold
    (done only after opening: while closed, those 1.5px would peek out above the flap as a thin green line) */
 .stage.is-open .liner-panel { animation: liner-tuck 1ms steps(1, start) calc(1000ms * var(--k)) both; }
 @keyframes liner-tuck {
   from { top: var(--y0); height: var(--H); --by: calc((var(--d) + var(--E)) * -1); }
-  to   { top: calc(var(--y0) - 4px); height: calc(var(--H) + 4px); --by: calc((var(--d) + var(--E)) * -1 + 4px); }
+  to   { top: calc(var(--y0) - 1.5px); height: calc(var(--H) + 1.5px); --by: calc((var(--d) + var(--E)) * -1 + 1.5px); }
 }
 
 /* ── flap ── */
