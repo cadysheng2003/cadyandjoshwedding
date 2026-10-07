@@ -1118,6 +1118,7 @@ html.view-open, html.view-open body { overflow: hidden; }
 <style>
 /* Phones: Safari's own bars take ~140px, so the page area is shorter than the carpet picture is tall.
    Fit the whole carpet (all four borders) into the visible area instead of cropping its top and bottom. */
+@media (max-width: 600px) { .s-date .d-yr { display: block; } }   /* phones: the year gets its own line */
 @media (max-width: 500px) and (max-aspect-ratio: 3/4) {
   html.has-bg .bg::after {
     top: 0; bottom: 0; height: 100%; transform: none; aspect-ratio: auto;
@@ -1442,7 +1443,7 @@ html.view-open, html.view-open body { overflow: hidden; }
   <div class="paper__in">
     <div class="paper__cols">
     <p class="s-kicker rv" data-i18n="sch.kicker"></p>
-    <h2 class="s-date rv" id="sch-date" data-i18n="sch.date"></h2>
+    <h2 class="s-date rv" id="sch-date" data-i18n-html="sch.date"></h2>
     <p class="s-place rv" data-i18n="sch.place"></p>
     <div class="dress rv">
       <p class="dress__kicker"><span data-i18n="dress.kicker"></span></p>
@@ -1807,7 +1808,7 @@ window.TRAVEL_CONFIG = { routes: [
       'env.open':    'Open the invitation',
       'cue.scroll':  'Scroll',
       'sch.kicker':  'Our Celebration',
-      'sch.date':    'March 26–31, 2027',
+      'sch.date':    'March 26–31,<span class="d-yr"> 2027</span>',
       'sch.place':   'Kochi, India',
       'dress.kicker': 'Dress Code',
       'dress.title': 'Wedding Ceremony · Formal',
