@@ -954,6 +954,9 @@ html.view-open, html.view-open body { overflow: hidden; }
 
 .q { font-family: var(--f2-sans); font-weight: 400; font-size: clamp(23px, 6.6vw, 28px); line-height: 1.45; letter-spacing: .006em; text-wrap: balance; outline: none; }
 .q--s { font-size: clamp(19px, 5.4vw, 23px); }
+.send-box { margin-top: 26px; text-align: center; }
+.send-msg { margin: 0; font-family: var(--f2-sans); font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
+.send-copy { margin-top: 10px; }
 .sub { font-family: var(--f2-sans); font-weight: 400; margin-top: 20px; font-size: 15.5px; line-height: 1.65; font-style: normal; color: var(--ink-soft); text-wrap: balance; }
 #confirm-title + .sub { margin-top: 10px; }
 #confirm-title { color: #D4883E; }
@@ -1526,12 +1529,14 @@ html.view-open, html.view-open body { overflow: hidden; }
     <section class="step" data-step="thanks" hidden>
       <h2 class="q hrt" data-i18n="thanks.no" tabindex="-1"></h2>
       <div class="actions"><button class="quiet" id="thanks-home" type="button" data-i18n="ui.toInvite"></button></div>
+      <div class="send-box" hidden aria-live="polite"><p class="send-msg"></p><button class="quiet send-copy" type="button" hidden></button></div>
     </section>
 
     <section class="step" data-step="confirm" hidden>
       <h2 class="q hrt" id="confirm-title" tabindex="-1"></h2>
       <p class="sub" data-i18n="confirm.sub"></p>
       <div class="actions"><button class="btn" id="to-travel" type="button" data-i18n="confirm.travel"></button></div>
+      <div class="send-box" hidden aria-live="polite"><p class="send-msg"></p><button class="quiet send-copy" type="button" hidden></button></div>
     </section>
 
   </div>
@@ -1596,7 +1601,8 @@ window.RsvpData = (function () {
       flightAssistanceAmount: typeof r.flightAssistanceAmount === 'number' ? r.flightAssistanceAmount : null,   // 0–1000 | null
       message:                String(r.message || '').trim(),
       language:               r.language === 'zh' ? 'zh' : 'en',
-      submissionTimestamp:    r.submissionTimestamp || new Date().toISOString()
+      submissionTimestamp:    r.submissionTimestamp || new Date().toISOString(),
+      submissionId:           String(r.submissionId || '')
     };
   }
 
@@ -1634,7 +1640,7 @@ window.RsvpData = (function () {
       var ctl = window.AbortController ? new AbortController() : null;
       var timer = ctl ? setTimeout(function () { ctl.abort(); }, 45000) : null;
       /* no Content-Type header on purpose: keeps it a "simple" request (no CORS preflight) */
-      return fetch(RSVP_ENDPOINT, { method: 'POST', body: JSON.stringify(record), signal: ctl ? ctl.signal : undefined })
+      return fetch(RSVP_ENDPOINT, { method: 'POST', body: JSON.stringify(record), keepalive: true, signal: ctl ? ctl.signal : undefined })
         .then(function (res) { return res.json(); })
         .then(function (j) { if (!j || !j.ok) throw new Error('save failed'); })
         .then(function () { if (timer) clearTimeout(timer); }, function (e) { if (timer) clearTimeout(timer); throw e; });
@@ -1644,12 +1650,40 @@ window.RsvpData = (function () {
   };
 
   var active = RSVP_ENDPOINT ? RemoteAdapter : LocalAdapter;
+
+  /* Background sending: the guest is never kept waiting. send() stores the reply on the phone first, then
+     delivers it in the background, retrying (with a growing pause) until the server confirms. A reply left
+     over from an earlier visit is sent the next time the page opens. Each reply carries a unique id so the
+     sheet can ignore a duplicate when a retry follows a request that actually got through. */
+  var QKEY = 'cj-rsvp-queue', queue = [], listeners = [], pumping = false, failures = 0, lastState = 'idle';
+  function loadQ() { try { queue = JSON.parse(localStorage.getItem(QKEY) || '[]') || []; } catch (e) { queue = []; } }
+  function saveQ() { try { localStorage.setItem(QKEY, JSON.stringify(queue)); } catch (e) {} }
+  function emit(st) { lastState = st; listeners.forEach(function (f) { try { f(st); } catch (e) {} }); }
+  function newId() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+  function pump() {
+    if (pumping || !queue.length) return;
+    pumping = true; emit('sending');
+    Promise.resolve().then(function () { return active.submit(queue[0]); }).then(function () {
+      queue.shift(); saveQ(); pumping = false; failures = 0;
+      if (queue.length) pump(); else emit('done');
+    }, function () {
+      pumping = false; failures++;
+      emit(failures >= 3 ? 'failed' : 'sending');
+      setTimeout(pump, Math.min(60000, 3000 * Math.pow(2, failures)));
+    });
+  }
+  loadQ();
+  if (queue.length) setTimeout(pump, 2500);
+  window.addEventListener('online', function () { failures = 0; pump(); });
   return {
     use:     function (adapter) { active = adapter; },
     submit:  function (record) { var rec = normalize(record); return Promise.resolve(active.submit(rec)).then(function () { return rec; }); },
     list:    function () { return (active.list ? active.list() : []); },
     clear:   function () { if (active.clear) active.clear(); },
-    adapter: function () { return active.name; }
+    adapter: function () { return active.name; },
+    send:    function (record) { var rec = normalize(record); rec.submissionId = newId(); queue.push(rec); saveQ(); pump(); return rec; },
+    onStatus: function (f) { listeners.push(f); },
+    status:  function () { return lastState; }
   };
 })();
 </script>
@@ -1781,6 +1815,11 @@ window.TRAVEL_CONFIG = { routes: [
       'confirm.sub': 'We can\'t wait to celebrate with you!!!!',
       'confirm.travel':'View travel information',
       'err.submit':  'Something went wrong, please try again',
+      'send.sending': 'Sending your reply… please keep this page open for a moment.',
+      'send.failed':  'Your reply hasn\'t reached us yet. We\'ll keep trying while this page is open. You can also copy it and send it to us directly',
+      'send.done':    '✓ Your reply has been received.',
+      'send.copy':    'Copy my reply',
+      'send.copied':  'Copied ✓',
       'aria.progress':'Step {n} of 5',
       'tr.navlink':  'Travel',
       'tr.kicker':   'Suggested Flights',
@@ -1836,6 +1875,11 @@ window.TRAVEL_CONFIG = { routes: [
       'confirm.sub': '我们迫不及待想与您一同庆祝。',
       'confirm.travel':'查看出行信息',
       'err.submit':  '出了点问题，请再试一次',
+      'send.sending': '正在发送您的回复…请稍候，先不要关闭页面。',
+      'send.failed':  '您的回复还没有送达。页面开着时我们会继续尝试，您也可以复制回复内容直接发给我们',
+      'send.done':    '✓ 已收到您的回复。',
+      'send.copy':    '复制我的回复',
+      'send.copied':  '已复制 ✓',
       'aria.progress':'第 {n} 步，共 5 步',
       'tr.navlink':  '行程',
       'tr.kicker':   '推荐航班',
@@ -2301,17 +2345,51 @@ window.TRAVEL_CONFIG = { routes: [
       language: state.lang,
       submissionTimestamp: new Date().toISOString()
     };
-    var btn = document.getElementById(btnId), err = document.getElementById(errId);
-    btn.disabled = true; err.textContent = '';
-    btn.textContent = state.lang === 'zh' ? '提交中…' : 'Submitting…';
-    window.RsvpData.submit(rec).then(function () {
-      btn.textContent = COPY[state.lang]['ui.submit'];
-      flow.submitted = true; stack = [];
-      showStep(declined ? 'thanks' : 'confirm', false);
-      renderDynamic();
-    }, function () {
-      err.textContent = COPY[state.lang]['err.submit']; btn.disabled = false; btn.textContent = COPY[state.lang]['ui.submit'];
+    var sent = window.RsvpData.send(rec);          /* stored on the phone, delivered in the background */
+    lastSent = sent; sendStart = Date.now(); sendShown = false;
+    flow.submitted = true; stack = [];
+    showStep(declined ? 'thanks' : 'confirm', false);
+    renderDynamic();
+    clearTimeout(sendTimer); sendTimer = setTimeout(function () { renderSend(); }, 6000);
+    renderSend();
+  }
+
+  /* — status line under the thank-you: silent while it goes quickly, speaks up only if it takes long or fails — */
+  var lastSent = null, sendTimer = null, sendStart = 0, sendShown = false, sendCopied = false;
+  function summaryText() {
+    var r = lastSent; if (!r) return '';
+    var zh = state.lang === 'zh', yn = function (v) { return v === 'yes' ? (zh ? '是' : 'yes') : v === 'no' ? (zh ? '否' : 'no') : '-'; };
+    return [ (zh ? '姓名：' : 'Name: ') + r.guestName,
+             (zh ? '参加婚礼：' : 'Wedding: ') + yn(r.weddingAttendance),
+             (zh ? '船屋：' : 'Houseboat: ') + yn(r.houseboatAttendance),
+             (zh ? '机票补贴：' : 'Flight help: ') + yn(r.flightAssistance) + (r.flightAssistanceAmount != null ? ' ($' + r.flightAssistanceAmount + ')' : ''),
+             (zh ? '留言：' : 'Message: ') + (r.message || '-') ].join('\n');
+  }
+  function renderSend() {
+    var st = window.RsvpData.status(), c = COPY[state.lang], text = '', showCopy = false;
+    if (lastSent) {
+      if (st === 'failed') { text = c['send.failed']; showCopy = true; sendShown = true; }
+      else if (st === 'sending' && Date.now() - sendStart >= 6000) { text = c['send.sending']; sendShown = true; }
+      else if (st === 'done' && sendShown) { text = c['send.done']; }
+    }
+    document.querySelectorAll('.send-box').forEach(function (bx) {
+      var p = bx.querySelector('.send-msg'), btn = bx.querySelector('.send-copy');
+      p.textContent = text; bx.hidden = !text;
+      btn.hidden = !showCopy; btn.textContent = sendCopied ? c['send.copied'] : c['send.copy'];
     });
+  }
+  window.RsvpData.onStatus(function () { renderSend(); });
+  document.querySelectorAll('.send-copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var t = summaryText();
+      var done = function () { sendCopied = true; renderSend(); setTimeout(function () { sendCopied = false; renderSend(); }, 2500); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(done, function () { fallbackCopy(t); done(); });
+      else { fallbackCopy(t); done(); }
+    });
+  });
+  function fallbackCopy(t) {
+    var ta = document.createElement('textarea'); ta.value = t; ta.style.cssText = 'position:fixed;left:-999px;top:0'; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta);
   }
   document.getElementById('decline-submit').addEventListener('click', function () { submit('decline', 'decline-submit', 'err-decline'); });
   document.getElementById('msg-submit').addEventListener('click', function () { submit('attend', 'msg-submit', 'err-msg'); });
@@ -2330,6 +2408,7 @@ window.TRAVEL_CONFIG = { routes: [
     var title = document.getElementById('confirm-title');
     if (title) title.textContent = COPY[lang]['confirm.title'].replace('{name}', flow ? flow.name : '');
     if (cur) setProgress(cur);
+    if (typeof renderSend === 'function') renderSend();
   }
 
   freshFlow();
