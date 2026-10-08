@@ -819,20 +819,31 @@ html.locked .paper { display: none; }
 #to-travel:hover:not(:disabled) { opacity: .88; }
 .rsvp {
   width: 260px; height: 94.6px; min-width: 0; min-height: 0; padding: 0; position: relative;
-  background: url("img/9deed78e0e.webp") center / contain no-repeat;
+  --rsvp-img: url("img/9deed78e0e.webp");
+  background: var(--rsvp-img) center / contain no-repeat;
   color: transparent; font-size: 0;
   transition: transform .3s ease, opacity .3s ease;
 }
 .rsvp:hover { opacity: .88; }
 .rsvp.landed { background-image: none; }
-/* idle invitation to tap: the badge breathes and a warm glow follows its outline (stops on hover, while the cat flies, and for reduced-motion) */
-@keyframes rsvp-breathe {
-  0%, 100% { transform: scale(1);    filter: drop-shadow(0 0 0 rgba(240, 214, 160, 0)); }
-  50%      { transform: scale(1.03); filter: drop-shadow(0 0 16px rgba(240, 214, 160, .95)); }
-}
+/* idle invitation to tap: the badge breathes and a soft glow appears OUTSIDE its outline only (the glow layer is masked with the badge's own shape, so nothing tints the inside).
+   Stops on hover, while the cat flies, and for reduced-motion. */
+@keyframes rsvp-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes rsvp-glow    { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 .rsvp { animation: rsvp-breathe 3.2s ease-in-out infinite; }
+.rsvp::before {
+  content: ""; position: absolute; inset: -34px; pointer-events: none; z-index: -1; opacity: 0;
+  background: var(--rsvp-img) center / 260px 94.6px no-repeat;
+  filter: drop-shadow(0 0 14px rgba(240, 214, 160, .95)) drop-shadow(0 0 5px rgba(240, 214, 160, .8));
+  -webkit-mask: var(--rsvp-img) center / 260px 94.6px no-repeat, linear-gradient(#000, #000);
+  -webkit-mask-composite: xor;
+          mask: var(--rsvp-img) center / 260px 94.6px no-repeat, linear-gradient(#000, #000);
+          mask-composite: exclude;
+  animation: rsvp-glow 3.2s ease-in-out infinite;
+}
 .rsvp:hover, .rsvp:active, .rsvp:focus-visible, .rsvp[data-flying="1"], .rsvp.landed { animation: none; }
-@media (prefers-reduced-motion: reduce) { .rsvp { animation: none; } }
+.rsvp:hover::before, .rsvp:active::before, .rsvp:focus-visible::before, .rsvp[data-flying="1"]::before, .rsvp.landed::before { animation: none; opacity: 0; }
+@media (prefers-reduced-motion: reduce) { .rsvp, .rsvp::before { animation: none; } }
 .rsvp.landed::after { content: ""; position: absolute; left: 0; top: -9.76px; width: 260px; height: 97.36px; background: url("img/1fd5c0292a.webp") 0 0 / 100% 100% no-repeat; pointer-events: none; }
 .cat-fly {
   position: fixed; top: 0; left: 0; width: 92px; pointer-events: none; z-index: 50; opacity: 0;
