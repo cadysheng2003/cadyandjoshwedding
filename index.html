@@ -825,14 +825,14 @@ html.locked .paper { display: none; }
 }
 .rsvp:hover { opacity: .88; }
 .rsvp.landed { background-image: none; }
-/* idle invitation to tap: the badge breathes, and a soft ring of light appears just OUTSIDE its outline (the ring is transparent in the middle, so nothing tints the badge itself).
-   Plain transform / opacity / gradient only (no mask or filter: those made the badge disappear on iPhone Safari). Stops on hover, while the cat flies, and for reduced-motion. */
+/* idle invitation to tap: the badge breathes, and a soft halo appears just OUTSIDE its outline (an outer box-shadow of an invisible ellipse: it is never drawn inside, so nothing tints the badge itself).
+   Plain transform / opacity / box-shadow only (no mask, filter or gradient tricks: those broke the badge on iPhone Safari). Stops on hover, while the cat flies, and for reduced-motion. */
 @keyframes rsvp-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 @keyframes rsvp-glow    { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 .rsvp { animation: rsvp-breathe 3.2s ease-in-out infinite; }
 .rsvp::before {
-  content: ""; position: absolute; inset: -34px -44px; pointer-events: none; opacity: 0;
-  background: radial-gradient(ellipse closest-side, rgba(240, 214, 160, 0) 70%, rgba(240, 214, 160, .6) 84%, rgba(240, 214, 160, 0) 100%);
+  content: ""; position: absolute; inset: 14px 30px; border-radius: 50%; pointer-events: none; opacity: 0;
+  box-shadow: 0 0 26px 14px rgba(240, 214, 160, .55);   /* an outer box-shadow is never painted inside the box, so the light stays outside */
   animation: rsvp-glow 3.2s ease-in-out infinite;
 }
 .rsvp:hover, .rsvp:active, .rsvp:focus-visible, .rsvp[data-flying="1"], .rsvp.landed { animation: none; }
