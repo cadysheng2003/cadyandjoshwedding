@@ -819,26 +819,20 @@ html.locked .paper { display: none; }
 #to-travel:hover:not(:disabled) { opacity: .88; }
 .rsvp {
   width: 260px; height: 94.6px; min-width: 0; min-height: 0; padding: 0; position: relative;
-  --rsvp-img: url("img/9deed78e0e.webp");
-  background: var(--rsvp-img) center / contain no-repeat;
+  background: url("img/9deed78e0e.webp") center / contain no-repeat;
   color: transparent; font-size: 0;
   transition: transform .3s ease, opacity .3s ease;
 }
 .rsvp:hover { opacity: .88; }
 .rsvp.landed { background-image: none; }
-/* idle invitation to tap: the badge breathes and a soft glow appears OUTSIDE its outline only (the glow layer is masked with the badge's own shape, so nothing tints the inside).
-   Stops on hover, while the cat flies, and for reduced-motion. */
+/* idle invitation to tap: the badge breathes, and a soft ring of light appears just OUTSIDE its outline (the ring is transparent in the middle, so nothing tints the badge itself).
+   Plain transform / opacity / gradient only (no mask or filter: those made the badge disappear on iPhone Safari). Stops on hover, while the cat flies, and for reduced-motion. */
 @keyframes rsvp-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 @keyframes rsvp-glow    { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 .rsvp { animation: rsvp-breathe 3.2s ease-in-out infinite; }
 .rsvp::before {
-  content: ""; position: absolute; inset: -34px; pointer-events: none; z-index: -1; opacity: 0;
-  background: var(--rsvp-img) center / 260px 94.6px no-repeat;
-  filter: drop-shadow(0 0 14px rgba(240, 214, 160, .95)) drop-shadow(0 0 5px rgba(240, 214, 160, .8));
-  -webkit-mask: var(--rsvp-img) center / 260px 94.6px no-repeat, linear-gradient(#000, #000);
-  -webkit-mask-composite: xor;
-          mask: var(--rsvp-img) center / 260px 94.6px no-repeat, linear-gradient(#000, #000);
-          mask-composite: exclude;
+  content: ""; position: absolute; inset: -34px -44px; pointer-events: none; opacity: 0;
+  background: radial-gradient(ellipse closest-side, rgba(240, 214, 160, 0) 70%, rgba(240, 214, 160, .6) 84%, rgba(240, 214, 160, 0) 100%);
   animation: rsvp-glow 3.2s ease-in-out infinite;
 }
 .rsvp:hover, .rsvp:active, .rsvp:focus-visible, .rsvp[data-flying="1"], .rsvp.landed { animation: none; }
