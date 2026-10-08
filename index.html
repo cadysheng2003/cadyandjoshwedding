@@ -825,14 +825,14 @@ html.locked .paper { display: none; }
 }
 .rsvp:hover { opacity: .88; }
 .rsvp.landed { background-image: none; }
-/* idle invitation to tap: the badge breathes, and a soft halo appears just OUTSIDE its outline (an outer box-shadow of an invisible ellipse: it is never drawn inside, so nothing tints the badge itself).
-   Plain transform / opacity / box-shadow only (no mask, filter or gradient tricks: those broke the badge on iPhone Safari). Stops on hover, while the cat flies, and for reduced-motion. */
+/* idle invitation to tap: the badge breathes, and a soft halo hugs its outline from OUTSIDE (a pre-drawn image: empty inside the badge shape, so nothing tints it).
+   Plain transform / opacity only (no mask, filter or gradient tricks: those broke the badge on iPhone Safari). Stops on hover, while the cat flies, and for reduced-motion. */
 @keyframes rsvp-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
 @keyframes rsvp-glow    { 0%, 100% { opacity: 0; } 50% { opacity: 1; } }
 .rsvp { animation: rsvp-breathe 3.2s ease-in-out infinite; }
 .rsvp::before {
-  content: ""; position: absolute; inset: 14px 30px; border-radius: 50%; pointer-events: none; opacity: 0;
-  box-shadow: 0 0 26px 14px rgba(240, 214, 160, .55);   /* an outer box-shadow is never painted inside the box, so the light stays outside */
+  content: ""; position: absolute; left: -37.56px; right: -37.56px; top: -30.56px; bottom: -30.56px; pointer-events: none; opacity: 0;
+  background: url("img/f8f90b7408.webp") center / 100% 100% no-repeat;   /* a pre-drawn halo that hugs the badge outline and is empty inside it */
   animation: rsvp-glow 3.2s ease-in-out infinite;
 }
 .rsvp:hover, .rsvp:active, .rsvp:focus-visible, .rsvp[data-flying="1"], .rsvp.landed { animation: none; }
@@ -2558,5 +2558,5 @@ window.TRAVEL_CONFIG = { routes: [
   window.__cj = { open: openEnvelope, replay: replay, setDev: setDev, applyArt: applyArt, unlock: unlock, go: go };
 })();
 </script>
-<script>window.addEventListener("load",function(){setTimeout(function(){["img/ad4bf6f3cb.webp", "img/5380178ba1.jpg", "img/b2ddd5dca4.webp", "img/5f1b77ef3c.webp", "img/9ec7bfd21e.webp", "img/ca922e244c.webp", "img/9deed78e0e.webp", "img/1fd5c0292a.webp", "img/8efd113645.jpg", "img/79b51dd9e0.webp", "img/4fca4f5eba.jpg", "img/f2b9b9f1b2.webp", "img/f6b1f901a8.webp", "img/8eee35ab70.webp", "img/d17dfe1c9f.webp", "img/7dbce7e279.webp", "img/9288fa38fb.webp"].forEach(function(u){var i=new Image();i.src=u;});},1200);});</script></body>
+<script>window.addEventListener("load",function(){setTimeout(function(){["img/ad4bf6f3cb.webp", "img/5380178ba1.jpg", "img/b2ddd5dca4.webp", "img/5f1b77ef3c.webp", "img/9ec7bfd21e.webp", "img/ca922e244c.webp", "img/9deed78e0e.webp", "img/f8f90b7408.webp", "img/1fd5c0292a.webp", "img/8efd113645.jpg", "img/79b51dd9e0.webp", "img/4fca4f5eba.jpg", "img/f2b9b9f1b2.webp", "img/f6b1f901a8.webp", "img/8eee35ab70.webp", "img/d17dfe1c9f.webp", "img/7dbce7e279.webp", "img/9288fa38fb.webp"].forEach(function(u){var i=new Image();i.src=u;});},1200);});</script></body>
 </html>
