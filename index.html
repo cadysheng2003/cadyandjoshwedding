@@ -989,6 +989,10 @@ html.view-open, html.view-open body { overflow: hidden; }
   transition: border-color .3s ease;
 }
 .field:focus { border-bottom-color: var(--accent); }
+.choice[data-q="meal"] { letter-spacing: .1em; font-size: 12px; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
+:root[lang="zh-Hans"] .choice[data-q="meal"] { letter-spacing: .2em; }
+.diet { display: block; margin-top: 30px; text-align: center; }
+.diet__l { display: block; font-family: var(--f2-sans); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); margin-bottom: 4px; }
 
 .pair { display: flex; gap: 14px; justify-content: center; margin-top: 46px; }
 .choice {
@@ -1469,7 +1473,7 @@ html.view-open, html.view-open body { overflow: hidden; }
 <section class="view" id="rsvp-view" aria-hidden="true" aria-label="RSVP">
   <header class="view__bar">
     <button class="back" id="rsvp-back" type="button"><span data-i18n="ui.back"></span></button>
-    <div class="progress" id="progress" role="progressbar" aria-valuemin="1" aria-valuemax="5" aria-valuenow="1"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="progress" id="progress" role="progressbar" aria-valuemin="1" aria-valuemax="6" aria-valuenow="1"><i></i><i></i><i></i><i></i><i></i><i></i></div>
     <span></span>
   </header>
 
@@ -1514,6 +1518,16 @@ html.view-open, html.view-open body { overflow: hidden; }
         <button class="choice" type="button" data-q="houseboat" data-v="yes" aria-pressed="false" data-i18n="ui.yes"></button>
         <button class="choice" type="button" data-q="houseboat" data-v="no" aria-pressed="false" data-i18n="ui.no"></button>
       </div>
+    </section>
+
+    <section class="step" data-step="meal" hidden>
+      <h2 class="q" data-i18n="q.meal" tabindex="-1"></h2>
+      <div class="pair" role="group">
+        <button class="choice" type="button" data-q="meal" data-v="vegetarian" aria-pressed="false" data-i18n="meal.veg"></button>
+        <button class="choice" type="button" data-q="meal" data-v="non-vegetarian" aria-pressed="false" data-i18n="meal.nonveg"></button>
+      </div>
+      <label class="diet"><span class="diet__l" data-i18n="meal.diet"></span><input class="field" id="f-diet" type="text" maxlength="300" autocomplete="off" data-i18n-ph="meal.diet.ph"></label>
+      <div class="actions"><button class="btn" id="meal-next" type="button" data-i18n="ui.continue" disabled></button></div>
     </section>
 
     <section class="step" data-step="flight" hidden>
@@ -1621,6 +1635,8 @@ window.RsvpData = (function () {
       guestName:              String(r.guestName || '').trim(),
       weddingAttendance:      r.weddingAttendance || null,          // 'yes' | 'no'
       houseboatAttendance:    r.houseboatAttendance || null,        // 'yes' | 'no' | null (not asked)
+      mealPreference:         r.mealPreference === 'vegetarian' || r.mealPreference === 'non-vegetarian' ? r.mealPreference : null,   // 'vegetarian' | 'non-vegetarian' | null (not asked)
+      dietaryNotes:           String(r.dietaryNotes || '').trim().slice(0, 300),
       flightAssistance:       r.flightAssistance || null,           // 'yes' | 'no' | null (not asked)
       flightAssistanceAmount: typeof r.flightAssistanceAmount === 'number' ? r.flightAssistanceAmount : null,   // 0–1000 | null
       message:                String(r.message || '').trim(),
@@ -1828,6 +1844,11 @@ window.TRAVEL_CONFIG = { routes: [
       'decline.c':   'With love,',
       'thanks.no':   'Thank you for letting us know',
       'q.houseboat': 'Will you be joining us for the houseboat celebration from March 29th–31st?',
+      'q.meal':      'Do you have a meal preference?',
+      'meal.veg':    'Vegetarian',
+      'meal.nonveg': 'Non-vegetarian',
+      'meal.diet':   'Allergies or other dietary needs (optional)',
+      'meal.diet.ph': 'e.g. nut allergy',
       'q.flight':    'Will you need assistance purchasing your plane ticket?',
       'flight.sub':  'We are happy to help with up to $1,000 toward your flight. Request the amount you need.',
       'flight.how':  'How much would you like?',
@@ -1891,6 +1912,11 @@ window.TRAVEL_CONFIG = { routes: [
       'decline.c':   '带着爱意，',
       'thanks.no':   '感谢您告知我们',
       'q.houseboat': '您是否会参加 3月29日至31日 的船屋庆典？',
+      'q.meal':      '您的餐食偏好是？',
+      'meal.veg':    '素食',
+      'meal.nonveg': '非素食',
+      'meal.diet':   '过敏或其他饮食需求（选填）',
+      'meal.diet.ph': '例如：坚果过敏',
       'q.flight':    '您是否需要协助购买机票？',
       'flight.sub':  '我们很乐意为您的机票提供最高 1,000 美元的补助，请填写您需要的金额。',
       'flight.how':  '您需要多少补助？',
@@ -2238,7 +2264,7 @@ window.TRAVEL_CONFIG = { routes: [
   /* ═══════════════════════════════════════════════════════════════
      RSVP FLOW: one question per screen
      ═══════════════════════════════════════════════════════════════ */
-  var STEP_IDX = { name: 1, wedding: 2, houseboat: 3, flight: 4, message: 5 };
+  var STEP_IDX = { name: 1, wedding: 2, houseboat: 3, meal: 4, flight: 5, message: 6 };
   var stepEls = {};
   document.querySelectorAll('.step').forEach(function (el) { stepEls[el.dataset.step] = el; });
 
@@ -2250,14 +2276,17 @@ window.TRAVEL_CONFIG = { routes: [
   var fRange   = document.getElementById('f-range');
   var fAmount  = document.getElementById('f-amount');
   var fMsg     = document.getElementById('f-msg');
+  var fDiet    = document.getElementById('f-diet');
+  var mealNext = document.getElementById('meal-next');
 
   var flow, stack, cur, busy = false;
 
   function freshFlow() {
-    flow = { name: '', wedding: null, houseboat: null, flight: null, amount: 0, message: '', submitted: false };
+    flow = { name: '', wedding: null, houseboat: null, meal: null, diet: '', flight: null, amount: 0, message: '', submitted: false };
     stack = []; cur = null; busy = false;
     Object.keys(stepEls).forEach(function (k) { stepEls[k].hidden = true; stepEls[k].classList.remove('in'); });
     fName.value = ''; fMsg.value = ''; nameNext.disabled = true;
+    fDiet.value = ''; mealNext.disabled = true;
     setAmount(0);
     document.querySelectorAll('.choice').forEach(function (b) { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
     setReveal(false);
@@ -2331,7 +2360,8 @@ window.TRAVEL_CONFIG = { routes: [
       var q = btn.dataset.q, v = btn.dataset.v;
       flow[q] = v; markChoice(q, v);
       if (q === 'wedding')   after(320, function () { forward(v === 'yes' ? 'houseboat' : 'decline'); });
-      if (q === 'houseboat') after(320, function () { forward('flight'); });
+      if (q === 'houseboat') after(320, function () { forward('meal'); });
+      if (q === 'meal') mealNext.disabled = false;
       if (q === 'flight') {
         setReveal(v === 'yes');
         if (v === 'no') after(320, function () { forward('message'); });
@@ -2339,6 +2369,11 @@ window.TRAVEL_CONFIG = { routes: [
       }
     });
   });
+
+  /* — meal preference (a choice is required; the dietary note is optional) — */
+  fDiet.addEventListener('input', function () { flow.diet = fDiet.value; });
+  fDiet.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !mealNext.disabled) { e.preventDefault(); mealNext.click(); } });
+  mealNext.addEventListener('click', function () { if (!flow.meal) return; flow.diet = fDiet.value.trim(); forward('flight'); });
 
   /* — flight assistance amount: slider and number always in sync, max $1,000 — */
   function clampAmount(n) { n = Math.round(Number(n)); if (!isFinite(n) || n < 0) n = 0; return Math.min(1000, n); }
@@ -2370,6 +2405,8 @@ window.TRAVEL_CONFIG = { routes: [
       guestName: flow.name,
       weddingAttendance: declined ? 'no' : 'yes',
       houseboatAttendance: declined ? null : flow.houseboat,
+      mealPreference: declined ? null : flow.meal,
+      dietaryNotes: declined ? '' : flow.diet,
       flightAssistance: declined ? null : flow.flight,
       flightAssistanceAmount: (declined || flow.flight !== 'yes') ? null : flow.amount,
       message: declined ? '' : flow.message,
@@ -2393,6 +2430,8 @@ window.TRAVEL_CONFIG = { routes: [
     return [ (zh ? '姓名：' : 'Name: ') + r.guestName,
              (zh ? '参加婚礼：' : 'Wedding: ') + yn(r.weddingAttendance),
              (zh ? '船屋：' : 'Houseboat: ') + yn(r.houseboatAttendance),
+             (zh ? '餐食：' : 'Meal: ') + (r.mealPreference === 'vegetarian' ? (zh ? '素食' : 'vegetarian') : r.mealPreference === 'non-vegetarian' ? (zh ? '非素食' : 'non-vegetarian') : '-'),
+             (zh ? '饮食需求：' : 'Dietary notes: ') + (r.dietaryNotes || '-'),
              (zh ? '机票补贴：' : 'Flight help: ') + yn(r.flightAssistance) + (r.flightAssistanceAmount != null ? ' ($' + r.flightAssistanceAmount + ')' : ''),
              (zh ? '留言：' : 'Message: ') + (r.message || '-') ].join('\n');
   }
