@@ -985,6 +985,8 @@ html.view-open, html.view-open body { overflow: hidden; }
 
 .q { font-family: var(--f2-sans); font-weight: 400; font-size: clamp(23px, 6.6vw, 28px); line-height: 1.45; letter-spacing: .006em; text-wrap: balance; outline: none; }
 .q--s { font-size: clamp(19px, 5.4vw, 23px); }
+.visa-hint { margin: 18px 0 0; text-align: center; font-family: var(--f2-sans); font-size: 13px; letter-spacing: .04em; }
+.visa-hint a { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(var(--accent-rgb), .45); text-underline-offset: 4px; }
 .send-box { margin-top: 26px; text-align: center; }
 .send-msg { margin: 0; font-family: var(--f2-sans); font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
 .send-copy { margin-top: 10px; }
@@ -1085,6 +1087,20 @@ html.view-open, html.view-open body { overflow: hidden; }
 .tr-citylink { color: var(--accent); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; cursor: pointer; }
 :root[lang="zh-Hans"] .t-intro { font-style: normal; font-size: 16px; letter-spacing: .06em; }
 .route { margin-top: 76px; }
+.route--visa { margin-top: 56px; }
+.visa__intro { font-family: var(--f2-sans); font-size: 15px; line-height: 1.65; color: var(--ink-soft); text-align: center; margin: 18px 0 18px; }
+.visa__card { border-bottom: 1px solid rgba(var(--ink-rgb), .14); }
+.visa__sum { list-style: none; cursor: pointer; padding: 16px 28px 16px 2px; position: relative; font-family: var(--f2-sans); font-size: 15.5px; letter-spacing: .04em; color: var(--ink); text-align: left; }
+.visa__sum::-webkit-details-marker { display: none; }
+.visa__sum::after { content: "+"; position: absolute; right: 4px; top: 50%; transform: translateY(-52%); font-size: 20px; line-height: 1; color: var(--accent); }
+.visa__card[open] > .visa__sum::after { content: "\2212"; }
+.visa__body { padding: 0 2px 18px; text-align: left; }
+.visa__lead { margin: 0 0 12px; font-family: var(--f2-sans); font-size: 14.5px; line-height: 1.65; color: var(--ink); }
+.visa__steps { margin: 0 0 12px; padding-left: 20px; font-family: var(--f2-sans); font-size: 14px; line-height: 1.65; color: var(--ink-soft); }
+.visa__steps li { margin-bottom: 8px; padding-left: 4px; }
+.visa__steps li::marker { color: var(--accent); }
+.visa__lp { margin: 6px 0; font-family: var(--f2-sans); font-size: 14px; }
+.visa__note { margin: 16px 0 0; font-family: var(--f2-sans); font-size: 12.5px; line-height: 1.65; color: var(--ink-soft); text-align: center; }
 .route__h { font-family: var(--f2-sans); font-size: 13px; font-weight: 400; letter-spacing: .3em; text-transform: uppercase; color: var(--accent); padding: 0 0 15px .3em; border-bottom: 1px solid rgba(var(--accent-rgb), .32); text-wrap: balance; }
 :root[lang="zh-Hans"] .route__h { font-size: 16px; letter-spacing: .22em; text-transform: none; }
 .opt__n { margin-top: 30px; font-family: var(--f2-sans); font-weight: 400; font-size: 10.5px; letter-spacing: .28em; text-transform: uppercase; color: var(--ink-soft); text-wrap: balance; }
@@ -1575,6 +1591,7 @@ html.view-open, html.view-open body { overflow: hidden; }
       <h2 class="q hrt" id="confirm-title" tabindex="-1"></h2>
       <p class="sub" data-i18n="confirm.sub"></p>
       <div class="actions"><button class="btn" id="to-travel" type="button" data-i18n="confirm.travel"></button></div>
+      <p class="visa-hint"><a href="#" id="to-visa" data-i18n="confirm.visa"></a></p>
       <div class="send-box" hidden aria-live="polite"><p class="send-msg"></p><button class="quiet send-copy" type="button" hidden></button></div>
     </section>
 
@@ -1601,6 +1618,7 @@ html.view-open, html.view-open body { overflow: hidden; }
         <div class="row"><dt data-i18n="tr.lbl.address"></dt><dd>1/373, Princess St,<br>Fort Nagar, Fort Kochi,<br>Kochi, Keralam 682001,<br>India</dd></div>
       </dl></div>
     </section>
+    <section class="route route--visa" id="visa-block"></section>
     <div id="routes"></div>
     <div class="travel__end"><button class="quiet" id="travel-home" type="button" data-i18n="ui.toInvite"></button></div>
   </main>
@@ -1811,6 +1829,51 @@ window.TRAVEL_CONFIG = { routes: [
   ] }
 ] };
 </script>
+<!-- VISA INFORMATION: bilingual data; the page and the downloadable PDFs are both built from this. Rules change, so keep "checked" up to date. -->
+<script id="visa-config">
+window.VISA_CONFIG = {
+  title: { en: 'Visa Information', zh: '签证信息' },
+  intro: { en: 'Everyone entering India needs a visa, and which one depends on the passport you travel on (not on where you live). Please sort this out before booking flights.',
+           zh: '前往印度需要签证，具体办理方式取决于您所持的护照（而不是居住地）。请在订机票之前先确认签证。' },
+  cards: [
+    { title: { en: 'US passport holders', zh: '美国护照持有者' },
+      lead:  { en: 'You can apply online for an India e-Visa (e-Tourist Visa). It is quick and done entirely online.',
+               zh: '您可以在线申请印度电子签证（e-Tourist Visa），全程在线办理，比较快捷。' },
+      steps: [
+        { en: 'Check your passport: it should have at least 6 months of validity and at least 2 blank pages.', zh: '检查护照：有效期至少 6 个月，并且至少有 2 页空白页。' },
+        { en: 'Apply on the official Indian government e-Visa website (link below) and choose the e-Tourist Visa (30-day, 1-year or 5-year options are offered).', zh: '在印度政府官方电子签证网站（见下方链接）申请，选择电子旅游签证（e-Tourist Visa），可选 30 天、1 年或 5 年。' },
+        { en: 'You can apply from 120 days to 4 days before you arrive. We suggest applying 3–4 weeks before the trip (for arrival on March 26, 2027, applications open in late November 2026).', zh: '可在抵达前 120 天至 4 天内申请。我们建议在出发前 3 到 4 周申请（2027 年 3 月 26 日抵达的话，2026 年 11 月下旬开始可以申请）。' },
+        { en: 'Upload a recent passport-style photo (plain light background, square, JPEG) and a PDF scan of your passport photo page. Pay the fee online; the amount depends on your nationality and visa type and is shown on the site.', zh: '上传近期证件照（浅色或白色背景、正方形、JPEG 格式）和护照照片页的 PDF 扫描件，并在线支付签证费（金额取决于国籍和签证类型，网站上会显示）。' },
+        { en: 'Print the approved e-Visa and carry it with your passport. Kochi (Cochin) airport is an approved port of entry for e-Visa holders.', zh: '获批后打印电子签证，与护照一起携带。科钦（Cochin）机场是电子签证持有者的指定入境口岸。' }
+      ],
+      links: [ { label: { en: 'Official India e-Visa website ↗', zh: '印度政府电子签证官网 ↗' }, url: 'https://indianvisaonline.gov.in/evisa/tvoa.html' } ] },
+    { title: { en: 'Chinese passport holders', zh: '中国护照持有者' },
+      lead:  { en: 'The e-Visa is currently not available to Chinese passport holders, so you apply for a regular tourist visa. India resumed issuing tourist visas to Chinese nationals in 2025.',
+               zh: '目前中国护照持有者不能办理电子签证，需要申请普通旅游签证。印度已于 2025 年恢复向中国公民签发旅游签证。' },
+      steps: [
+        { en: 'Check your passport: it should have at least 6 months of validity and at least 2 blank pages.', zh: '检查护照：有效期至少 6 个月，并且至少有 2 页空白页。' },
+        { en: 'Fill in the online visa application form on the official Indian visa website (link below), then submit it with your passport and documents at the Indian Visa Application Centre (BLS) in China, or at the Indian embassy, consulate or authorised application centre where you live.', zh: '先在印度官方签证网站（见下方链接）填写在线申请表，再携带护照和材料，到中国境内的印度签证申请中心（BLS），或您居住地的印度使领馆及其授权申请中心递交。' },
+        { en: 'Chinese passport holders who are not permanent residents of the country they live in may be asked to apply in their home country. Please confirm with the Indian mission or visa centre first.', zh: '如果您持中国护照、但不是居住国的永久居民，可能需要回中国申请。请先向印度使领馆或签证申请中心确认。' },
+        { en: 'Requirements, fees and processing times change often and differ between centres. Please start early: we suggest applying at least 6 to 8 weeks before the trip.', zh: '具体要求、费用和办理时间经常调整，各申请中心也不完全一样。请尽早办理：我们建议至少提前 6 到 8 周申请。' },
+        { en: 'Typical documents are your passport, a photo, the application form, and proof of your trip (flights and hotel). We are happy to provide an invitation letter and hotel details on request.', zh: '通常需要护照、照片、申请表，以及行程证明（机票和酒店预订）。如需邀请函或酒店信息，我们很乐意提供。' }
+      ],
+      links: [ { label: { en: 'Official India visa website ↗', zh: '印度政府签证官网 ↗' }, url: 'https://indianvisaonline.gov.in/visa/index.html' },
+               { label: { en: 'Embassy of India in China ↗', zh: '印度驻华大使馆 ↗' }, url: 'https://www.eoibeijing.gov.in/' } ] },
+    { title: { en: 'Other passports', zh: '其他护照' },
+      lead:  { en: 'Rules depend on your nationality.', zh: '签证规定取决于您的国籍。' },
+      steps: [
+        { en: 'Check on the official e-Visa page whether your passport is on the list of eligible countries. If it is, follow the steps for US passport holders.', zh: '在官方电子签证页面查看您的护照是否在可办理电子签证的国家名单上；如果在，可参照美国护照持有者的办理步骤。' },
+        { en: 'If it is not, contact the nearest Indian embassy or consulate. Feel free to reach out to us as well.', zh: '如果不在名单上，请联系最近的印度使领馆，也欢迎随时联系我们。' }
+      ],
+      links: [ { label: { en: 'Official India e-Visa website ↗', zh: '印度政府电子签证官网 ↗' }, url: 'https://indianvisaonline.gov.in/evisa/tvoa.html' } ] }
+  ],
+  checked: { en: 'This is a general guide, checked on October 10, 2026. Visa rules can change, so please always confirm on the official websites above before you apply.',
+             zh: '以上为一般性指引，核对于 2026 年 10 月 10 日。签证规定可能变化，申请前请务必以上方官方网站为准。' },
+  help:    { en: 'Questions or need an invitation letter? Contact us: +1 2243157716 or WeChat cadykathy.',
+             zh: '有疑问或需要邀请函？请联系我们：+1 2243157716，或微信 cadykathy。' }
+};
+</script>
+
 
 <script>
 (function () {
@@ -1867,6 +1930,7 @@ window.TRAVEL_CONFIG = { routes: [
       'msg.ph':      'Write your message here',
       'confirm.title':'Thank you, {name}',
       'confirm.sub': 'We can\'t wait to celebrate with you!!!!',
+      'confirm.visa': 'Please check your visa requirements →',
       'confirm.travel':'View travel information',
       'err.submit':  'Something went wrong, please try again',
       'send.sending': 'Sending your reply… please keep this page open for a moment.',
@@ -1935,6 +1999,7 @@ window.TRAVEL_CONFIG = { routes: [
       'msg.ph':      '在这里写下您的留言',
       'confirm.title':'谢谢您，{name}',
       'confirm.sub': '我们迫不及待想与您一同庆祝。',
+      'confirm.visa': '出发前请先确认签证要求 →',
       'confirm.travel':'查看出行信息',
       'err.submit':  '出了点问题，请再试一次',
       'send.sending': '正在发送您的回复…请稍候，先不要关闭页面。',
@@ -2216,6 +2281,28 @@ window.TRAVEL_CONFIG = { routes: [
   function both(key, fn) {
     return { en: fn ? fn(COPY.en[key]) : COPY.en[key], zh: fn ? fn(COPY.zh[key]) : COPY.zh[key] };
   }
+  (function buildVisa() {
+    var cfg = window.VISA_CONFIG, host = document.getElementById('visa-block');
+    if (!cfg || !host) return;
+    host.appendChild(mk('h3', 'route__h', cfg.title));
+    host.appendChild(mk('p', 'visa__intro', cfg.intro));
+    cfg.cards.forEach(function (c) {
+      var d = document.createElement('details'); d.className = 'visa__card';
+      d.appendChild(mk('summary', 'visa__sum', c.title));
+      var body = mk('div', 'visa__body');
+      if (c.lead) body.appendChild(mk('p', 'visa__lead', c.lead));
+      var ol = document.createElement('ol'); ol.className = 'visa__steps';
+      c.steps.forEach(function (st) { ol.appendChild(mk('li', '', st)); });
+      body.appendChild(ol);
+      (c.links || []).forEach(function (l) {
+        var a = document.createElement('a'); a.className = 'row__link'; a.href = l.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+        paints.push([a, l.label]); var p = mk('p', 'visa__lp'); p.appendChild(a); body.appendChild(p);
+      });
+      d.appendChild(body); host.appendChild(d);
+    });
+    host.appendChild(mk('p', 'visa__note', cfg.checked));
+    host.appendChild(mk('p', 'visa__note', cfg.help));
+  })();
   (function buildTravel() {
     var host = document.getElementById('routes'), cfg = window.TRAVEL_CONFIG || { routes: [] };
     cfg.routes.forEach(function (r, routeIdx) {
@@ -2442,6 +2529,7 @@ window.TRAVEL_CONFIG = { routes: [
 
   /* — after submission — */
   document.getElementById('to-travel').addEventListener('click', function () { go('travel'); });
+  document.getElementById('to-visa').addEventListener('click', function (e) { e.preventDefault(); go('travel'); setTimeout(function () { try { document.getElementById('visa-block').scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (x) {} }, 900); });
   document.getElementById('topbar-travel').addEventListener('click', function () { go('travel'); });
   document.getElementById('thanks-home').addEventListener('click', function () { go('home'); });
   document.getElementById('travel-back').addEventListener('click', function () { go(cur ? 'rsvp' : 'home'); });
