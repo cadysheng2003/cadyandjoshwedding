@@ -1132,10 +1132,7 @@ html.view-open, html.view-open body { overflow: hidden; }
 <style>
 /* Phones: Safari's own bars take ~140px, so the page area is shorter than the carpet picture is tall.
    Fit the whole carpet (all four borders) into the visible area instead of cropping its top and bottom. */
-@media (max-width: 600px) {   /* phones: the dates on one line, the year small and spaced underneath like a caption */
-  .s-date .d-c { display: none; }
-  .s-date .d-yr { display: block; margin-top: 14px; font-family: var(--f2-sans); font-weight: 400; font-size: 15px; letter-spacing: .5em; padding-left: .5em; color: var(--accent); }
-}
+@media (max-width: 600px) { .s-date .d-yr { display: block; } }   /* phones: the year gets its own line */
 @media (max-width: 500px) and (max-aspect-ratio: 3/4) {
   html.has-bg .bg::after {
     top: 0; bottom: 0; height: 100%; transform: none; aspect-ratio: auto;
@@ -1826,7 +1823,7 @@ window.TRAVEL_CONFIG = { routes: [
       'env.open':    'Open the invitation',
       'cue.scroll':  'Scroll',
       'sch.kicker':  'Our Celebration',
-      'sch.date':    'March 26–31<span class="d-c">,</span><span class="d-yr"> 2027</span>',
+      'sch.date':    'March 26–31,<span class="d-yr"> 2027</span>',
       'sch.place':   'Kochi, India',
       'dress.kicker': 'Dress Code',
       'dress.title': 'Wedding Ceremony · Formal',
