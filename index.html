@@ -691,6 +691,9 @@ html.has-seal .seal { background-image: var(--art-seal); }
 .paper__portrait {
   position: relative; width: min(92vw, 100%); aspect-ratio: 1348 / 1885; margin: 48px auto 0;
 }
+.paper__portrait { margin-bottom: 34px; }
+.photo-credit { position: absolute; left: 0; right: 0; top: 100%; margin: 11px 0 0; text-align: center; font-family: var(--f-read); font-style: italic; font-weight: 400; font-size: 14.5px; letter-spacing: .05em; color: rgba(var(--accent-rgb), .82); }
+:root[lang="zh-Hans"] .photo-credit { font-style: normal; font-size: 13.5px; letter-spacing: .12em; font-family: var(--f2-sans); }
 .paper__photo {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
@@ -1464,6 +1467,7 @@ html.view-open, html.view-open body { overflow: hidden; }
     </div>
     <div class="paper__portrait rv">
       <img class="paper__photo" alt="" src="img/4fca4f5eba.jpg">
+      <p class="photo-credit" data-i18n="photo.credit"></p>
     </div>
     <div id="sched"></div>
     </div>
@@ -1486,8 +1490,8 @@ html.view-open, html.view-open body { overflow: hidden; }
 
       <div class="fireworks" aria-hidden="true">
         <div class="fireworks-canvas">
-          <img class="fireworks-piece fireworks-piece--b" src="img/f6b1f901a8.webp" alt="">
-          <img class="fireworks-piece fireworks-piece--a" src="img/8eee35ab70.webp" alt="">
+          <img class="fireworks-piece fireworks-piece--b" src="img/2973ba3d7c.webp" alt="">
+          <img class="fireworks-piece fireworks-piece--a" src="img/0e829b90ba.webp" alt="">
           <img class="fireworks-piece fireworks-piece--c" src="img/d17dfe1c9f.webp" alt="">
           <img class="fireworks-piece fireworks-piece--e" src="img/7dbce7e279.webp" alt="">
           <img class="fireworks-piece fireworks-piece--d" src="img/9288fa38fb.webp" alt="">
@@ -1824,6 +1828,7 @@ window.TRAVEL_CONFIG = { routes: [
       'dress.kicker': 'Dress Code',
       'dress.title': 'Wedding Ceremony · Formal',
       'dress.title2': 'Other Days · Festive',
+      'photo.credit': 'Photo by Hanji ♡',
       'dress.body':  '<span class="c-floral">Floral</span> &amp; <span class="c-botanical">botanical</span> attire is encouraged throughout.<br>Warm seaside weather around 88°F (31°C) — light, breathable clothing recommended.',
       'btn.rsvp':    'RSVP',
       'ui.back':     'Back',
@@ -1891,6 +1896,7 @@ window.TRAVEL_CONFIG = { routes: [
       'dress.kicker': '着装要求',
       'dress.title': '婚礼仪式 · 正式着装',
       'dress.title2': '其余活动 · 节日感着装',
+      'photo.credit': '摄影：Hanji ♡',
       'dress.body':  '欢迎在整个庆典期间选择带有<span class="c-floral">花卉</span>与<span class="c-botanical">植物</span>元素的服装。<br>海边气候温暖，约 <strong>31°C</strong>，建议选择轻薄、透气的衣物。',
       'btn.rsvp':    '回复邀请',
       'ui.back':     '返回',
@@ -2513,5 +2519,5 @@ window.TRAVEL_CONFIG = { routes: [
   window.__cj = { open: openEnvelope, replay: replay, setDev: setDev, applyArt: applyArt, unlock: unlock, go: go };
 })();
 </script>
-<script>window.addEventListener("load",function(){setTimeout(function(){["img/ad4bf6f3cb.webp", "img/5380178ba1.jpg", "img/b2ddd5dca4.webp", "img/5f1b77ef3c.webp", "img/9ec7bfd21e.webp", "img/ca922e244c.webp", "img/9deed78e0e.webp", "img/f8f90b7408.webp", "img/1fd5c0292a.webp", "img/8efd113645.jpg", "img/79b51dd9e0.webp", "img/4fca4f5eba.jpg", "img/f2b9b9f1b2.webp", "img/f6b1f901a8.webp", "img/8eee35ab70.webp", "img/d17dfe1c9f.webp", "img/7dbce7e279.webp", "img/9288fa38fb.webp"].forEach(function(u){var i=new Image();i.src=u;});},1200);});</script></body>
+<script>window.addEventListener("load",function(){setTimeout(function(){["img/ad4bf6f3cb.webp", "img/5380178ba1.jpg", "img/b2ddd5dca4.webp", "img/5f1b77ef3c.webp", "img/9ec7bfd21e.webp", "img/ca922e244c.webp", "img/9deed78e0e.webp", "img/f8f90b7408.webp", "img/1fd5c0292a.webp", "img/8efd113645.jpg", "img/79b51dd9e0.webp", "img/4fca4f5eba.jpg", "img/f2b9b9f1b2.webp", "img/2973ba3d7c.webp", "img/0e829b90ba.webp", "img/d17dfe1c9f.webp", "img/7dbce7e279.webp", "img/9288fa38fb.webp"].forEach(function(u){var i=new Image();i.src=u;});},1200);});</script></body>
 </html>
