@@ -709,6 +709,14 @@ html.locked .paper { display: none; }
 
 .paper__in { max-width: 460px; margin: 0 auto; padding: 112px 32px calc(128px + env(safe-area-inset-bottom)); text-align: center; }
 
+.pdf-wrap { margin: 26px 0 0; text-align: center; }
+.pdf-wrap--sched { margin: 26px 0 0; }
+.pdf-wrap--sched .pdf-dl { border: 0; padding: 6px 0; font-size: 10.5px; text-decoration: underline; text-decoration-color: rgba(var(--accent-rgb), .45); text-underline-offset: 5px; }
+.pdf-wrap--sched .pdf-dl:hover { background: none; text-decoration-color: currentColor; }
+.pdf-dl { display: inline-block; font-family: var(--f2-sans); font-weight: 400; font-size: 11px; letter-spacing: .26em; text-transform: uppercase; color: var(--accent); text-decoration: none; padding: 11px 18px; border: 1px solid rgba(var(--accent-rgb), .45); transition: background-color .25s ease, color .25s ease; }
+.pdf-dl:hover { background-color: rgba(var(--accent-rgb), .08); }
+.pdf-dl--zh, :root[lang="zh-Hans"] .pdf-dl--en { display: none; }
+:root[lang="zh-Hans"] .pdf-dl--zh { display: inline-block; text-transform: none; letter-spacing: .2em; font-size: 12.5px; }
 .s-kicker { font-family: var(--f2-sans); font-weight: 400; font-size: 11px; letter-spacing: .34em; padding-left: .34em; text-transform: uppercase; color: var(--accent); }
 .s-date { font-family: var(--f2-serif); font-weight: 300; font-optical-sizing: auto; margin-top: 24px; font-size: clamp(34px, 10vw, 46px); line-height: 1.16; letter-spacing: .005em; text-wrap: balance; }
 .s-place { font-family: var(--f2-sans); font-weight: 400; margin-top: 14px; font-size: 16px; font-style: normal; color: var(--ink-soft); }
@@ -1470,6 +1478,7 @@ html.view-open, html.view-open body { overflow: hidden; }
       <p class="photo-credit" data-i18n="photo.credit"></p>
     </div>
     <div id="sched"></div>
+    <p class="pdf-wrap pdf-wrap--sched"><a class="pdf-dl pdf-dl--en" href="itinerary-en.pdf" target="_blank" rel="noopener">Download itinerary (PDF) <span aria-hidden="true">↓</span></a><a class="pdf-dl pdf-dl--zh" href="itinerary-zh.pdf" target="_blank" rel="noopener">下载行程 PDF <span aria-hidden="true">↓</span></a></p>
     </div>
 
     <div class="rsvp-wrap rv">
@@ -1583,6 +1592,7 @@ html.view-open, html.view-open body { overflow: hidden; }
     <div class="tr-bow" aria-hidden="true"></div>
     <h2 class="s-kicker" id="tr-title" data-i18n="tr.kicker"></h2>
     <p class="t-intro" data-i18n-html="tr.intro"></p>
+    <p class="pdf-wrap"><a class="pdf-dl pdf-dl--en" href="itinerary-en.pdf" target="_blank" rel="noopener">Download itinerary (PDF) <span aria-hidden="true">↓</span></a><a class="pdf-dl pdf-dl--zh" href="itinerary-zh.pdf" target="_blank" rel="noopener">下载行程 PDF <span aria-hidden="true">↓</span></a></p>
     </div>
     <section class="route route--hotel" id="route-hotel">
       <h3 class="route__h" data-i18n="tr.hotel"></h3>
