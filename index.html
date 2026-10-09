@@ -1088,6 +1088,8 @@ html.view-open, html.view-open body { overflow: hidden; }
 :root[lang="zh-Hans"] .t-intro { font-style: normal; font-size: 16px; letter-spacing: .06em; }
 .route { margin-top: 76px; }
 .route--visa { margin-top: 56px; }
+.tr-flights-head { margin-top: 76px; text-align: center; }
+.tr-flights-head .t-intro { margin-top: 18px; }
 .visa__intro { font-family: var(--f2-sans); font-size: 15px; line-height: 1.65; color: var(--ink-soft); text-align: center; margin: 18px 0 18px; }
 .visa__card { border-bottom: 1px solid rgba(var(--ink-rgb), .14); }
 .visa__sum { list-style: none; cursor: pointer; padding: 16px 28px 16px 2px; position: relative; font-family: var(--f2-sans); font-size: 15.5px; letter-spacing: .04em; color: var(--ink); text-align: left; }
@@ -1608,7 +1610,6 @@ html.view-open, html.view-open body { overflow: hidden; }
     <div class="tr-head">
     <div class="tr-bow" aria-hidden="true"></div>
     <h2 class="s-kicker" id="tr-title" data-i18n="tr.kicker"></h2>
-    <p class="t-intro" data-i18n-html="tr.intro"></p>
     <p class="pdf-wrap"><a class="pdf-dl pdf-dl--en" href="itinerary-en.pdf" target="_blank" rel="noopener">Download itinerary (PDF) <span aria-hidden="true">↓</span></a><a class="pdf-dl pdf-dl--zh" href="itinerary-zh.pdf" target="_blank" rel="noopener">下载行程 PDF <span aria-hidden="true">↓</span></a></p>
     </div>
     <section class="route route--hotel" id="route-hotel">
@@ -1619,6 +1620,10 @@ html.view-open, html.view-open body { overflow: hidden; }
       </dl></div>
     </section>
     <section class="route route--visa" id="visa-block"></section>
+    <div class="tr-flights-head">
+      <h2 class="s-kicker" id="tr-flights-title" data-i18n="tr.kicker2"></h2>
+      <p class="t-intro" data-i18n-html="tr.intro"></p>
+    </div>
     <div id="routes"></div>
     <div class="travel__end"><button class="quiet" id="travel-home" type="button" data-i18n="ui.toInvite"></button></div>
   </main>
@@ -1833,8 +1838,8 @@ window.TRAVEL_CONFIG = { routes: [
 <script id="visa-config">
 window.VISA_CONFIG = {
   title: { en: 'Visa Information', zh: '签证信息' },
-  intro: { en: 'Everyone entering India needs a visa, and which one depends on the passport you travel on (not on where you live). Please sort this out before booking flights.',
-           zh: '前往印度需要签证，具体办理方式取决于您所持的护照（而不是居住地）。请在订机票之前先确认签证。' },
+  intro: { en: 'Everyone entering India needs a visa, and which one depends on the passport you travel on (not on where you live). Please check your visa requirements before booking flights and plan accordingly.',
+           zh: '前往印度需要签证，具体办理方式取决于您所持的护照（而不是居住地）。订机票前请先确认您的签证要求，并据此提前安排。' },
   cards: [
     { title: { en: 'US passport holders', zh: '美国护照持有者' },
       lead:  { en: 'You can apply online for an India e-Visa (e-Tourist Visa). It is quick and done entirely online.',
@@ -1940,7 +1945,8 @@ window.VISA_CONFIG = {
       'send.copied':  'Copied ✓',
       'aria.progress':'Step {n} of 5',
       'tr.navlink':  'Travel',
-      'tr.kicker':   'Suggested Flights',
+      'tr.kicker':   'Travel Information',
+      'tr.kicker2':  'Suggested Flights',
       'tr.intro':    'To make your trip to Kochi a little easier, we\'ve put together a few suggested flights from <span class="tr-citylink" data-route="0" role="link" tabindex="0">New York</span>, <span class="tr-citylink" data-route="1" role="link" tabindex="0">San Francisco</span>, and <span class="tr-citylink" data-route="2" role="link" tabindex="0">Boston</span>.',
       'tr.to':       'Kochi',
       'tr.hotel':    'Where We\'re Staying',
@@ -2009,7 +2015,8 @@ window.VISA_CONFIG = {
       'send.copied':  '已复制 ✓',
       'aria.progress':'第 {n} 步，共 5 步',
       'tr.navlink':  '行程',
-      'tr.kicker':   '推荐航班',
+      'tr.kicker':   '旅行信息',
+      'tr.kicker2':  '推荐航班',
       'tr.intro':    '为了让您前往科钦的旅程更轻松，我们整理了从<span class="tr-citylink" data-route="0" role="link" tabindex="0">纽约</span>、<span class="tr-citylink" data-route="1" role="link" tabindex="0">旧金山</span>和<span class="tr-citylink" data-route="2" role="link" tabindex="0">波士顿</span>出发的几个推荐航班。',
       'tr.to':       '科钦',
       'tr.hotel':    '入住酒店',
