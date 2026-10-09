@@ -996,6 +996,8 @@ html.view-open, html.view-open body { overflow: hidden; }
 .field:focus { border-bottom-color: var(--accent); }
 .choice[data-q="meal"] { letter-spacing: .1em; font-size: 12px; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
 :root[lang="zh-Hans"] .choice[data-q="meal"] { letter-spacing: .2em; }
+.support__p { margin-top: 18px; }
+.support__tel { color: inherit; font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; white-space: nowrap; }
 .diet { display: block; margin-top: 30px; text-align: center; }
 .diet__l { display: block; font-family: var(--f2-sans); font-size: 13.5px; line-height: 1.5; color: var(--ink-soft); margin-bottom: 4px; }
 
@@ -1535,22 +1537,10 @@ html.view-open, html.view-open body { overflow: hidden; }
       <div class="actions"><button class="btn" id="meal-next" type="button" data-i18n="ui.continue" disabled></button></div>
     </section>
 
-    <section class="step" data-step="flight" hidden>
-      <h2 class="q" data-i18n="q.flight" tabindex="-1"></h2>
-      <p class="sub" data-i18n="flight.sub"></p>
-      <div class="pair" role="group">
-        <button class="choice" type="button" data-q="flight" data-v="yes" aria-pressed="false" data-i18n="ui.yes"></button>
-        <button class="choice" type="button" data-q="flight" data-v="no" aria-pressed="false" data-i18n="ui.no"></button>
-      </div>
-      <div class="reveal" id="flight-reveal" aria-hidden="true">
-        <div class="reveal__in">
-          <p class="q q--s" id="q-how" data-i18n="flight.how"></p>
-          <input class="range" id="f-range" type="range" min="0" max="1000" step="1" value="0" aria-labelledby="q-how">
-          <div class="range-ends" aria-hidden="true"><span>$0</span><span>$1,000</span></div>
-          <label class="amount"><span data-i18n="flight.exact"></span><span class="amount__box"><b>$</b><input id="f-amount" type="text" inputmode="numeric" autocomplete="off" value="0"></span></label>
-          <div class="actions"><button class="btn" id="flight-next" type="button" data-i18n="ui.continue"></button></div>
-        </div>
-      </div>
+    <section class="step" data-step="support" hidden>
+      <h2 class="q" data-i18n="support.a" tabindex="-1"></h2>
+      <p class="sub support__p"><span data-i18n="support.b1"></span> <a class="support__tel" href="tel:+12243157716">@2243157716</a><span data-i18n="support.b2"></span></p>
+      <div class="actions"><button class="btn" id="support-next" type="button" data-i18n="ui.continue"></button></div>
     </section>
 
     <section class="step" data-step="message" hidden>
@@ -1854,10 +1844,9 @@ window.TRAVEL_CONFIG = { routes: [
       'meal.nonveg': 'Non-vegetarian',
       'meal.diet':   'Allergies or other dietary needs (optional)',
       'meal.diet.ph': 'e.g. nut allergy',
-      'q.flight':    'Will you need assistance purchasing your plane ticket?',
-      'flight.sub':  'We are happy to help with up to $1,000 toward your flight. Request the amount you need.',
-      'flight.how':  'How much would you like?',
-      'flight.exact':'Exact amount',
+      'support.a':   'We know it\'s a big ask to come this far.',
+      'support.b1':  'If you need any support with paying for your travel, please do not hesitate to reach out to us',
+      'support.b2':  '. We are more than happy to help!',
       'msg.title':   'Almost there',
       'msg.sub':     'Feel free to leave us a message!',
       'msg.ph':      'Write your message here',
@@ -1922,10 +1911,9 @@ window.TRAVEL_CONFIG = { routes: [
       'meal.nonveg': '非素食',
       'meal.diet':   '过敏或其他饮食需求（选填）',
       'meal.diet.ph': '例如：坚果过敏',
-      'q.flight':    '您是否需要协助购买机票？',
-      'flight.sub':  '我们很乐意为您的机票提供最高 1,000 美元的补助，请填写您需要的金额。',
-      'flight.how':  '您需要多少补助？',
-      'flight.exact':'确切金额',
+      'support.a':   '我们知道，要您远道而来并不容易。',
+      'support.b1':  '如果您在旅费方面需要任何帮助，请随时联系我们',
+      'support.b2':  '，我们非常乐意帮忙！',
       'msg.title':   '就快完成了',
       'msg.sub':     '欢迎给我们留言！',
       'msg.ph':      '在这里写下您的留言',
@@ -2269,7 +2257,7 @@ window.TRAVEL_CONFIG = { routes: [
   /* ═══════════════════════════════════════════════════════════════
      RSVP FLOW: one question per screen
      ═══════════════════════════════════════════════════════════════ */
-  var STEP_IDX = { name: 1, wedding: 2, houseboat: 3, meal: 4, flight: 5, message: 6 };
+  var STEP_IDX = { name: 1, wedding: 2, houseboat: 3, meal: 4, support: 5, message: 6 };
   var stepEls = {};
   document.querySelectorAll('.step').forEach(function (el) { stepEls[el.dataset.step] = el; });
 
@@ -2277,9 +2265,6 @@ window.TRAVEL_CONFIG = { routes: [
   var progress = document.getElementById('progress');
   var fName    = document.getElementById('f-name');
   var nameNext = document.getElementById('name-next');
-  var reveal   = document.getElementById('flight-reveal');
-  var fRange   = document.getElementById('f-range');
-  var fAmount  = document.getElementById('f-amount');
   var fMsg     = document.getElementById('f-msg');
   var fDiet    = document.getElementById('f-diet');
   var mealNext = document.getElementById('meal-next');
@@ -2287,14 +2272,12 @@ window.TRAVEL_CONFIG = { routes: [
   var flow, stack, cur, busy = false;
 
   function freshFlow() {
-    flow = { name: '', wedding: null, houseboat: null, meal: null, diet: '', flight: null, amount: 0, message: '', submitted: false };
+    flow = { name: '', wedding: null, houseboat: null, meal: null, diet: '', message: '', submitted: false };
     stack = []; cur = null; busy = false;
     Object.keys(stepEls).forEach(function (k) { stepEls[k].hidden = true; stepEls[k].classList.remove('in'); });
     fName.value = ''; fMsg.value = ''; nameNext.disabled = true;
     fDiet.value = ''; mealNext.disabled = true;
-    setAmount(0);
     document.querySelectorAll('.choice').forEach(function (b) { b.classList.remove('sel'); b.setAttribute('aria-pressed', 'false'); });
-    setReveal(false);
     ['err-decline', 'err-msg'].forEach(function (id) { document.getElementById(id).textContent = ''; });
     document.getElementById('decline-submit').disabled = false;
     document.getElementById('msg-submit').disabled = false;
@@ -2353,10 +2336,6 @@ window.TRAVEL_CONFIG = { routes: [
       var on = b.dataset.v === v; b.classList.toggle('sel', on); b.setAttribute('aria-pressed', String(on));
     });
   }
-  function setReveal(on) {
-    reveal.classList.toggle('open', on);
-    reveal.setAttribute('aria-hidden', String(!on));
-  }
   function after(ms, fn) { busy = true; setTimeout(function () { busy = false; fn(); }, ms); }
 
   document.querySelectorAll('.choice').forEach(function (btn) {
@@ -2367,36 +2346,15 @@ window.TRAVEL_CONFIG = { routes: [
       if (q === 'wedding')   after(320, function () { forward(v === 'yes' ? 'houseboat' : 'decline'); });
       if (q === 'houseboat') after(320, function () { forward('meal'); });
       if (q === 'meal') mealNext.disabled = false;
-      if (q === 'flight') {
-        setReveal(v === 'yes');
-        if (v === 'no') after(320, function () { forward('message'); });
-        else setTimeout(function () { try { document.getElementById('flight-next').scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (e) {} }, 500);
-      }
     });
   });
 
   /* — meal preference (a choice is required; the dietary note is optional) — */
   fDiet.addEventListener('input', function () { flow.diet = fDiet.value; });
   fDiet.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !mealNext.disabled) { e.preventDefault(); mealNext.click(); } });
-  mealNext.addEventListener('click', function () { if (!flow.meal) return; flow.diet = fDiet.value.trim(); forward('flight'); });
+  mealNext.addEventListener('click', function () { if (!flow.meal) return; flow.diet = fDiet.value.trim(); forward('support'); });
+  document.getElementById('support-next').addEventListener('click', function () { forward('message'); });
 
-  /* — flight assistance amount: slider and number always in sync, max $1,000 — */
-  function clampAmount(n) { n = Math.round(Number(n)); if (!isFinite(n) || n < 0) n = 0; return Math.min(1000, n); }
-  function setAmount(n) {
-    n = clampAmount(n); flow && (flow.amount = n);
-    fRange.value = n; fAmount.value = String(n);
-    fRange.style.setProperty('--fill', (n / 10) + '%');
-  }
-  fRange.addEventListener('input', function () { setAmount(fRange.value); });
-  fAmount.addEventListener('input', function () {
-    var raw = fAmount.value.replace(/[^\d]/g, '');
-    if (raw === '') { flow.amount = 0; fRange.value = 0; fRange.style.setProperty('--fill', '0%'); fAmount.value = ''; return; }
-    var n = clampAmount(parseInt(raw, 10));
-    flow.amount = n; fAmount.value = String(n); fRange.value = n; fRange.style.setProperty('--fill', (n / 10) + '%');
-  });
-  fAmount.addEventListener('focus', function () { setTimeout(function () { try { fAmount.select(); } catch (e) {} }, 0); });   /* typing replaces the 0 */
-  fAmount.addEventListener('blur', function () { setAmount(fAmount.value === '' ? 0 : fAmount.value); });
-  document.getElementById('flight-next').addEventListener('click', function () { setAmount(fAmount.value === '' ? 0 : fAmount.value); forward('message'); });
 
   /* — message — */
   fMsg.addEventListener('input', function () { flow.message = fMsg.value; });
@@ -2412,8 +2370,6 @@ window.TRAVEL_CONFIG = { routes: [
       houseboatAttendance: declined ? null : flow.houseboat,
       mealPreference: declined ? null : flow.meal,
       dietaryNotes: declined ? '' : flow.diet,
-      flightAssistance: declined ? null : flow.flight,
-      flightAssistanceAmount: (declined || flow.flight !== 'yes') ? null : flow.amount,
       message: declined ? '' : flow.message,
       language: state.lang,
       submissionTimestamp: new Date().toISOString()
@@ -2437,7 +2393,6 @@ window.TRAVEL_CONFIG = { routes: [
              (zh ? '船屋：' : 'Houseboat: ') + yn(r.houseboatAttendance),
              (zh ? '餐食：' : 'Meal: ') + (r.mealPreference === 'vegetarian' ? (zh ? '素食' : 'vegetarian') : r.mealPreference === 'non-vegetarian' ? (zh ? '非素食' : 'non-vegetarian') : '-'),
              (zh ? '饮食需求：' : 'Dietary notes: ') + (r.dietaryNotes || '-'),
-             (zh ? '机票补贴：' : 'Flight help: ') + yn(r.flightAssistance) + (r.flightAssistanceAmount != null ? ' ($' + r.flightAssistanceAmount + ')' : ''),
              (zh ? '留言：' : 'Message: ') + (r.message || '-') ].join('\n');
   }
   function renderSend() {
