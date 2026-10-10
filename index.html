@@ -989,7 +989,7 @@ html.view-open, html.view-open body { overflow: hidden; }
 .visa-hint a { color: var(--accent); text-decoration: underline; text-decoration-color: rgba(var(--accent-rgb), .45); text-underline-offset: 4px; }
 .send-box { margin-top: 26px; text-align: center; }
 .send-msg { margin: 0; font-family: var(--f2-sans); font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
-.send-copy { margin-top: 10px; }
+.send-copy { margin-top: 14px; border: 1px solid rgba(var(--accent-rgb), .55); padding: 11px 22px; color: var(--accent); }
 .sub { font-family: var(--f2-sans); font-weight: 400; margin-top: 20px; font-size: 15.5px; line-height: 1.65; font-style: normal; color: var(--ink-soft); text-wrap: balance; }
 #confirm-title + .sub { margin-top: 10px; }
 #confirm-title { color: #D4883E; }
@@ -1941,6 +1941,7 @@ window.VISA_CONFIG = {
       'send.sending': 'Sending your reply… please keep this page open for a moment.',
       'send.failed':  'Your reply hasn\'t reached us yet. We\'ll keep trying while this page is open. You can also copy it and send it to us directly: WeChat cadykathy, or email cadysheng2003@gmail.com',
       'send.done':    '✓ Your reply has been received.',
+      'send.wechat':  'To make sure we get your reply, please tap the button below to copy it, then paste it to us on WeChat: cadykathy.',
       'send.copy':    'Copy my reply',
       'send.copied':  'Copied ✓',
       'aria.progress':'Step {n} of 5',
@@ -2011,6 +2012,7 @@ window.VISA_CONFIG = {
       'send.sending': '正在发送您的回复…请稍候，先不要关闭页面。',
       'send.failed':  '您的回复还没有送达。页面开着时我们会继续尝试，您也可以复制回复内容直接发给我们：微信 cadykathy，或邮箱 cadysheng2003@gmail.com',
       'send.done':    '✓ 已收到您的回复。',
+      'send.wechat':  '为确保我们收到您的回复，请点击下方按钮复制，然后粘贴发送给我的微信：cadykathy。',
       'send.copy':    '复制我的回复',
       'send.copied':  '已复制 ✓',
       'aria.progress':'第 {n} 步，共 5 步',
@@ -2498,7 +2500,8 @@ window.VISA_CONFIG = {
   function summaryText() {
     var r = lastSent; if (!r) return '';
     var zh = state.lang === 'zh', yn = function (v) { return v === 'yes' ? (zh ? '是' : 'yes') : v === 'no' ? (zh ? '否' : 'no') : '-'; };
-    return [ (zh ? '姓名：' : 'Name: ') + r.guestName,
+    return [ (zh ? '【Cady & Josh 婚礼回复】' : '[Cady & Josh wedding RSVP]'),
+             (zh ? '姓名：' : 'Name: ') + r.guestName,
              (zh ? '参加婚礼：' : 'Wedding: ') + yn(r.weddingAttendance),
              (zh ? '船屋：' : 'Houseboat: ') + yn(r.houseboatAttendance),
              (zh ? '餐食：' : 'Meal: ') + (r.mealPreference === 'vegetarian' ? (zh ? '素食' : 'vegetarian') : r.mealPreference === 'non-vegetarian' ? (zh ? '非素食' : 'non-vegetarian') : '-'),
@@ -2507,7 +2510,9 @@ window.VISA_CONFIG = {
   }
   function renderSend() {
     var st = window.RsvpData.status(), c = COPY[state.lang], text = '', showCopy = false;
-    if (lastSent) {
+    var inWeChat = /MicroMessenger/i.test(navigator.userAgent);   /* Google (the sheet) cannot be reached from mainland China, so WeChat users are asked to send the reply by WeChat right away */
+    if (lastSent && inWeChat && st !== 'done') { text = c['send.wechat']; showCopy = true; sendShown = true; }
+    else if (lastSent) {
       if (st === 'failed') { text = c['send.failed']; showCopy = true; sendShown = true; }
       else if (st === 'sending' && Date.now() - sendStart >= 14000) { text = c['send.failed']; showCopy = true; sendShown = true; }   /* still nothing after 14 s (e.g. Google is unreachable from mainland China): tell them and give the WeChat / email way out */
       else if (st === 'sending' && Date.now() - sendStart >= 6000) { text = c['send.sending']; sendShown = true; }
