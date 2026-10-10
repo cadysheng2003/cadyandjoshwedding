@@ -2510,8 +2510,8 @@ window.VISA_CONFIG = {
   }
   function renderSend() {
     var st = window.RsvpData.status(), c = COPY[state.lang], text = '', showCopy = false;
-    var inWeChat = /MicroMessenger/i.test(navigator.userAgent);   /* Google (the sheet) cannot be reached from mainland China, so WeChat users are asked to send the reply by WeChat right away */
-    if (lastSent && inWeChat && st !== 'done') { text = c['send.wechat']; showCopy = true; sendShown = true; }
+    var inWeChat = /MicroMessenger/i.test(navigator.userAgent);   /* Google (the sheet) cannot be reached from mainland China, so WeChat users and Chinese-language guests are asked to send the reply by WeChat right away (it turns into a tick if the reply does arrive) */
+    if (lastSent && (inWeChat || state.lang === 'zh') && st !== 'done') { text = c['send.wechat']; showCopy = true; sendShown = true; }
     else if (lastSent) {
       if (st === 'failed') { text = c['send.failed']; showCopy = true; sendShown = true; }
       else if (st === 'sending' && Date.now() - sendStart >= 14000) { text = c['send.failed']; showCopy = true; sendShown = true; }   /* still nothing after 14 s (e.g. Google is unreachable from mainland China): tell them and give the WeChat / email way out */
