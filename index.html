@@ -1710,7 +1710,7 @@ window.RsvpData = (function () {
     name: 'google sheet',
     submit: function (record) {
       var ctl = window.AbortController ? new AbortController() : null;
-      var timer = ctl ? setTimeout(function () { ctl.abort(); }, 45000) : null;
+      var timer = ctl ? setTimeout(function () { ctl.abort(); }, 15000) : null;
       /* no Content-Type header on purpose: keeps it a "simple" request (no CORS preflight) */
       return fetch(RSVP_ENDPOINT, { method: 'POST', body: JSON.stringify(record), keepalive: true, signal: ctl ? ctl.signal : undefined })
         .then(function (res) { return res.json(); })
@@ -1740,7 +1740,7 @@ window.RsvpData = (function () {
       if (queue.length) pump(); else emit('done');
     }, function () {
       pumping = false; failures++;
-      emit(failures >= 3 ? 'failed' : 'sending');
+      emit(failures >= 2 ? 'failed' : 'sending');
       setTimeout(pump, Math.min(60000, 3000 * Math.pow(2, failures)));
     });
   }
@@ -2489,7 +2489,7 @@ window.VISA_CONFIG = {
     flow.submitted = true; stack = [];
     showStep(declined ? 'thanks' : 'confirm', false);
     renderDynamic();
-    clearTimeout(sendTimer); sendTimer = setTimeout(function () { renderSend(); }, 6000);
+    clearTimeout(sendTimer); sendTimer = setTimeout(function () { renderSend(); }, 6000); setTimeout(function () { renderSend(); }, 14200);
     renderSend();
   }
 
@@ -2509,6 +2509,7 @@ window.VISA_CONFIG = {
     var st = window.RsvpData.status(), c = COPY[state.lang], text = '', showCopy = false;
     if (lastSent) {
       if (st === 'failed') { text = c['send.failed']; showCopy = true; sendShown = true; }
+      else if (st === 'sending' && Date.now() - sendStart >= 14000) { text = c['send.failed']; showCopy = true; sendShown = true; }   /* still nothing after 14 s (e.g. Google is unreachable from mainland China): tell them and give the WeChat / email way out */
       else if (st === 'sending' && Date.now() - sendStart >= 6000) { text = c['send.sending']; sendShown = true; }
       else if (st === 'done' && sendShown) { text = c['send.done']; }
     }
